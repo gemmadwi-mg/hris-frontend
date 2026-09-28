@@ -10,15 +10,21 @@ const loading = ref(false);
 const authStore = useAuthStore();
 const router = useRouter();
 
+// Contoh jika logika ini ada di Login.vue setelah memanggil authStore.login()
 const handleLogin = async () => {
-    loading.value = true;
     const success = await authStore.login(email.value, password.value);
-    loading.value = false;
-
     if (success) {
-        router.push({ name: 'Dashboard' }); // Redirect jika sukses
+        // Cek role user
+        if (authStore.user.role === 'Karyawan') {
+            router.push('/karyawan/dashboard');
+        } else {
+            router.push('/'); // Dasbor admin/HR
+        }
+    } else {
+        // Tampilkan error
     }
 };
+
 </script>
 
 <template>
