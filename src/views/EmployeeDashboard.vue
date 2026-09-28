@@ -309,6 +309,14 @@ const submitLeaveRequest = async () => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
+        // 1. TAMBAHKAN ALERT SUKSES DI SINI
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Pengajuan cuti Anda telah terkirim dan sedang menunggu persetujuan Manajer.',
+            confirmButtonColor: '#4f46e5', // Warna indigo
+        });
+
         // ... (SweetAlert sukses dan reset form seperti biasa)
         // Kosongkan form setelah sukses
         leaveForm.leave_type = 'Tahunan'; // Kembalikan ke default
@@ -323,7 +331,15 @@ const submitLeaveRequest = async () => {
 
         fetchMyLeaves(); // Muat ulang tabel
     } catch (error) {
-        // ... (SweetAlert error)
+        console.error('Gagal mengajukan cuti:', error);
+
+        // 3. TAMBAHKAN ALERT GAGAL DI SINI
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.response?.data?.message || 'Terjadi kesalahan saat mengirim pengajuan cuti. Silakan coba lagi.',
+            confirmButtonColor: '#ef4444', // Warna merah
+        });
     } finally {
         isSubmittingLeave.value = false;
     }

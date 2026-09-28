@@ -12,16 +12,17 @@ const router = useRouter();
 
 // Contoh jika logika ini ada di Login.vue setelah memanggil authStore.login()
 const handleLogin = async () => {
-    const success = await authStore.login(email.value, password.value);
-    if (success) {
-        // Cek role user
-        if (authStore.user.role === 'Karyawan') {
-            router.push('/karyawan/dashboard');
+    loading.value = true;
+    try {
+        const success = await authStore.login(email.value, password.value);
+        if (success) {
+            // Semua pengguna (HR, Manager, Karyawan) diarahkan ke pintu utama Dasbor
+            router.push('/');
         } else {
-            router.push('/'); // Dasbor admin/HR
+            // Error biasanya sudah di-handle oleh store Pinia
         }
-    } else {
-        // Tampilkan error
+    } finally {
+        loading.value = false;
     }
 };
 

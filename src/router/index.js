@@ -11,51 +11,47 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'Login', component: Login, meta: { guest: true } },
-    { path: '/', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+
+    // DASHBOARD SEKARANG BERTINDAK SEBAGAI MASTER LAYOUT
     {
-      path: '/employees/create',
-      name: 'AddEmployee',
-      component: AddEmployee,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/employees/edit/:id',
-      name: 'EditEmployee',
-      component: EditEmployee,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/admin/payroll',
-      name: 'PayrollAdmin',
-      component: () => import('../views/PayrollAdmin.vue'),
-      meta: {
-        requiresAuth: true,
-        roles: ['HR', 'Superadmin'] // Hanya role ini yang boleh masuk
-      }
-    },
-    {
-      path: '/my-payslip',
-      name: 'MyPayslip',
-      component: () => import('../views/MyPayslip.vue'),
-      meta: { requiresAuth: true } // Bebas untuk semua role yang sudah login
-    },
-    {
-      path: '/manager/leaves',
-      name: 'LeaveManagement',
-      component: LeaveManagement,
-      meta: {
-        requiresAuth: true,
-        roles: ['HR', 'Manager'] // Hanya role ini yang diizinkan
-      }
-    },
-    {
-      path: '/karyawan/dashboard',
-      name: 'EmployeeDashboard',
-      component: EmployeeDashboard,
-      meta: {
-        requiresAuth: true,
-        roles: ['Karyawan'] // Hanya role ini yang diizinkan
-      }
+      path: '/',
+      component: Dashboard,
+      meta: { requiresAuth: true },
+      // SEMUA HALAMAN DI DALAM CHILDREN AKAN MENDAPATKAN SIDEBAR & NAVBAR
+      children: [
+        {
+          path: '', // Ini akan terbuka otomatis saat user masuk ke URL '/'
+          name: 'Dashboard', // Pindahkan name 'Dashboard' ke anak ini
+          component: () => import('../views/HomeContent.vue')
+        },
+        {
+          path: 'employees/create',
+          name: 'AddEmployee',
+          component: AddEmployee
+        },
+        {
+          path: 'employees/edit/:id',
+          name: 'EditEmployee',
+          component: EditEmployee
+        },
+        {
+          path: 'my-payslip',
+          name: 'MyPayslip',
+          component: () => import('../views/MyPayslip.vue')
+        },
+        {
+          path: 'manager/leaves',
+          name: 'LeaveManagement',
+          component: LeaveManagement,
+          meta: { roles: ['HR', 'Manager'] }
+        },
+        {
+          path: 'manager/attendance-management',
+          name: 'AttendanceManagement',
+          component: () => import('../views/AttendanceManagement.vue'),
+          meta: { roles: ['HR', 'Manager'] }
+        }
+      ]
     }
   ]
 });
