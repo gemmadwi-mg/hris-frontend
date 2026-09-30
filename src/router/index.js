@@ -5,7 +5,7 @@ import Dashboard from '../views/Dashboard.vue';
 import AddEmployee from '../views/AddEmployee.vue'; // Tambahkan ini
 import EditEmployee from '@/views/EditEmployee.vue';
 import LeaveManagement from '@/views/LeaveManagement.vue';
-import EmployeeDashboard from '@/views/EmployeeDashboard.vue';
+import EmployeeDirectory from '../views/EmployeeDirectory.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,6 +24,7 @@ const router = createRouter({
           name: 'Dashboard', // Pindahkan name 'Dashboard' ke anak ini
           component: () => import('../views/HomeContent.vue')
         },
+        { path: 'employees', name: 'EmployeeDirectory', component: EmployeeDirectory },
         {
           path: 'employees/create',
           name: 'AddEmployee',
@@ -35,9 +36,20 @@ const router = createRouter({
           component: EditEmployee
         },
         {
+          path: '/payroll',
+          name: 'PayrollManagement',
+          component: () => import('../views/PayrollManagement.vue'),
+          meta: { requiresAuth: true, role: ['HR', 'Manager'] }
+        },
+        {
           path: 'my-payslip',
           name: 'MyPayslip',
           component: () => import('../views/MyPayslip.vue')
+        },
+        {
+          path: 'my-leaves',
+          name: 'MyLeaves',
+          component: () => import('../views/MyLeaves.vue')
         },
         {
           path: 'manager/leaves',

@@ -19,15 +19,22 @@
         <div class="flex-1 p-4 space-y-1">
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2 mt-2">Menu Utama</h3>
 
-            <!-- MENU: DASBOR UTAMA -->
+            <!-- MENU: DASBOR UTAMA (Sekarang khusus Analitik Grafik) -->
             <button @click="router.push({ name: 'Dashboard' })"
                 :class="route.name === 'Dashboard' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 font-medium'"
                 class="w-full flex items-center gap-3 p-3 text-left rounded-lg transition">
-                <span>🏠 Dasbor Utama</span>
+                <span>📊 Dasbor Analitik</span>
             </button>
 
             <!-- MENU KHUSUS MANAJER / HR -->
             <template v-if="['HR', 'Manager'].includes(authStore.user?.role)">
+
+                <!-- MENU BARU: DIREKTORI KARYAWAN -->
+                <button @click="router.push({ name: 'EmployeeDirectory' })"
+                    :class="route.name === 'EmployeeDirectory' ? 'bg-purple-50 text-purple-700 font-bold' : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700 font-medium'"
+                    class="w-full flex items-center gap-3 p-3 text-left rounded-lg transition">
+                    <span>👥 Direktori Karyawan</span>
+                </button>
 
                 <!-- MENU: REKAP KEHADIRAN -->
                 <button @click="router.push({ name: 'AttendanceManagement' })"
@@ -42,10 +49,26 @@
                     class="w-full flex items-center gap-3 p-3 text-left rounded-lg transition">
                     <span>📅 Kelola Cuti</span>
                 </button>
+
+                <!-- MENU BARU: PAYROLL & PENCAIRAN -->
+                <button @click="router.push({ name: 'PayrollManagement' })"
+                    :class="route.name === 'PayrollManagement' ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 font-medium'"
+                    class="w-full flex items-center gap-3 p-3 text-left rounded-lg transition">
+                    <span>💸 Payroll & Pencairan</span>
+                </button>
+
+
             </template>
 
             <!-- MENU KHUSUS KARYAWAN -->
             <template v-else>
+                <!-- MENU: PENGAJUAN CUTI -->
+                <button @click="router.push({ name: 'MyLeaves' })"
+                    :class="route.name === 'MyLeaves' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 font-medium'"
+                    class="w-full flex items-center gap-3 p-3 text-left rounded-lg transition">
+                    <span>✈️ Pengajuan Cuti</span>
+                </button>
+
                 <!-- MENU: SLIP GAJI SAYA -->
                 <button @click="router.push({ name: 'MyPayslip' })"
                     :class="route.name === 'MyPayslip' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700 font-medium'"
@@ -55,7 +78,7 @@
             </template>
         </div>
 
-        <!-- Tombol Logout (Menempel di dasar layar) -->
+        <!-- Tombol Logout -->
         <div class="p-4 border-t border-gray-100">
             <button @click="handleLogout"
                 class="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-red-50 text-red-600 font-medium transition">
@@ -70,9 +93,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
 
 const router = useRouter();
-const route = useRoute(); // 2. Inisialisasi route
+const route = useRoute();
 const authStore = useAuthStore();
-
 
 const handleLogout = async () => {
     await authStore.logout();

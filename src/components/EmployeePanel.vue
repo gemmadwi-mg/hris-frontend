@@ -1,133 +1,57 @@
 <template>
-    <div class="max-w-5xl mx-auto space-y-8">
-        <!-- KOTAK REKAM KEHADIRAN -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Rekam Kehadiran Harian</h2>
-                <p class="text-gray-500 text-sm mt-1">Pastikan lokasi GPS peramban Anda aktif.</p>
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- KOTAK REKAM KEHADIRAN (FOKUS UTAMA) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+
+            <div class="mb-10 mt-2">
+                <h2 class="text-3xl font-black text-gray-800">Rekam Kehadiran</h2>
+                <p class="text-gray-500 mt-2">Selamat bekerja! Pastikan GPS Anda aktif.</p>
+
+                <div class="mt-8 inline-block bg-gray-50 border border-gray-100 rounded-2xl px-10 py-6 shadow-inner">
+                    <p class="text-sm font-medium text-gray-500 uppercase tracking-widest mb-2">{{ currentDate }}</p>
+                    <p class="text-6xl font-black text-gray-800 tracking-tighter font-mono">{{ currentTime }}</p>
+                </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
                 <button @click="clockIn" :disabled="loading"
-                    class="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200 disabled:opacity-50 flex items-center justify-center gap-2">
-                    <span>🌤️</span> Clock In (Masuk)
+                    class="w-full sm:w-64 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200 disabled:opacity-50 flex items-center justify-center gap-3">
+                    <span class="text-2xl">🌤️</span> Clock In
                 </button>
 
                 <button @click="clockOut" :disabled="loading"
-                    class="w-full sm:w-auto px-8 py-3 bg-orange-500 text-white rounded-xl font-bold text-lg hover:bg-orange-600 transition shadow-lg shadow-orange-200 disabled:opacity-50 flex items-center justify-center gap-2">
-                    <span>🌙</span> Clock Out (Pulang)
+                    class="w-full sm:w-64 py-4 bg-orange-500 text-white rounded-xl font-bold text-lg hover:bg-orange-600 transition shadow-lg shadow-orange-200 disabled:opacity-50 flex items-center justify-center gap-3">
+                    <span class="text-2xl">🌙</span> Clock Out
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <!-- KOTAK FORM PENGAJUAN CUTI -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Pengajuan Cuti</h2>
-                <form @submit.prevent="submitLeaveRequest" class="space-y-4">
-                    <!-- ... (KODE FORM CUTI ANDA TETAP SAMA PERSIS SEPERTI SEBELUMNYA) ... -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Cuti</label>
-                        <select v-model="leaveForm.leave_type" required
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 border bg-white">
-                            <option value="Tahunan">Cuti Tahunan</option>
-                            <option value="Sakit">Cuti Sakit</option>
-                            <option value="Penting">Cuti Alasan Penting</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Mulai</label>
-                            <input type="date" v-model="leaveForm.start_date" required
-                                class="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Selesai</label>
-                            <input type="date" v-model="leaveForm.end_date" required
-                                class="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border" />
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Alasan</label>
-                        <textarea v-model="leaveForm.reason" required rows="2"
-                            class="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border"></textarea>
-                    </div>
-                    <div v-if="leaveForm.leave_type === 'Sakit'"
-                        class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <label class="block text-sm font-medium text-blue-800 mb-1">Upload Surat Dokter (Wajib)</label>
-                        <input type="file" @change="handleFileUpload" accept=".pdf,.jpg,.jpeg,.png" required
-                            class="w-full text-sm text-gray-500" />
-                    </div>
-                    <div class="flex justify-end pt-2">
-                        <button type="submit" :disabled="isSubmittingLeave"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-lg transition disabled:opacity-50">
-                            {{ isSubmittingLeave ? 'Mengirim...' : 'Kirim Pengajuan' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="space-y-8">
-                <!-- KOTAK RIWAYAT PENGAJUAN -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Riwayat Cuti</h2>
-                    <!-- ... (KODE TABEL RIWAYAT CUTI ANDA TETAP SAMA) ... -->
-                    <div v-if="myLeaves.length === 0"
-                        class="text-center text-gray-500 py-4 bg-gray-50 rounded-lg text-sm">Belum ada riwayat pengajuan
-                        cuti.</div>
-                    <div v-else class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Periode
-                                    </th>
-                                    <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Status
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr v-for="leave in myLeaves" :key="leave.id">
-                                    <td class="px-4 py-2 text-gray-900 whitespace-nowrap">{{ leave.start_date }} s/d {{
-                                        leave.end_date }}</td>
-                                    <td class="px-4 py-2 text-center">
-                                        <span
-                                            :class="{ 'bg-yellow-100 text-yellow-800': leave.status === 'Pending', 'bg-green-100 text-green-800': leave.status === 'Approved', 'bg-red-100 text-red-800': leave.status === 'Rejected' }"
-                                            class="px-2 py-1 rounded text-xs font-semibold">{{ leave.status }}</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- WIDGET STATISTIK CEPAT -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="p-4 bg-indigo-50 text-indigo-600 rounded-xl text-2xl">📅</div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Sisa Cuti Tahunan</p>
+                    <h3 class="text-2xl font-bold text-gray-800">12 <span
+                            class="text-sm font-normal text-gray-400">Hari</span></h3>
                 </div>
-
-                <!-- KOTAK SLIP GAJI -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Slip Gaji Terakhir</h2>
-                    <!-- ... (KODE TABEL SLIP GAJI ANDA TETAP SAMA) ... -->
-                    <div v-if="myPayslips.length === 0"
-                        class="text-center text-gray-500 py-4 bg-gray-50 rounded-lg text-sm">Belum ada data slip gaji.
-                    </div>
-                    <div v-else class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Periode
-                                    </th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
-                                        Diterima</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr v-for="slip in myPayslips" :key="slip.id">
-                                    <td class="px-4 py-2 font-medium"><span
-                                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Bulan {{
-                                                slip.bulan }}/{{ slip.tahun }}</span></td>
-                                    <td class="px-4 py-2 font-bold text-green-600 text-right">{{
-                                        formatRupiah(slip.total_gaji_bersih) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="p-4 bg-green-50 text-green-600 rounded-xl text-2xl">✅</div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Kehadiran Bulan Ini</p>
+                    <h3 class="text-2xl font-bold text-gray-800">18 <span
+                            class="text-sm font-normal text-gray-400">Hari</span></h3>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="p-4 bg-red-50 text-red-600 rounded-xl text-2xl">⏰</div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Keterlambatan</p>
+                    <h3 class="text-2xl font-bold text-gray-800">0 <span
+                            class="text-sm font-normal text-gray-400">Kali</span></h3>
                 </div>
             </div>
         </div>
@@ -135,173 +59,154 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
-import { useAuthStore } from '../stores/authStore';
+import { onMounted, onUnmounted, ref } from 'vue';
 import api from '../services/api';
 import Swal from 'sweetalert2';
-import { useRouter } from 'vue-router';
 
-const authStore = useAuthStore();
 const loading = ref(false);
-const router = useRouter();
+const currentTime = ref('');
+const currentDate = ref('');
+let timer;
 
-
-// State untuk Form Cuti & Riwayat
-const isSubmittingLeave = ref(false);
-const myLeaves = ref([]);
-// ... tambahkan state baru di bawah state myLeaves
-const myPayslips = ref([]);
-
-
-
-// Fungsi format Rupiah
-const formatRupiah = (angka) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
+const updateClock = () => {
+    const now = new Date();
+    currentTime.value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    currentDate.value = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 
-const fetchMyPayslips = async () => {
-    try {
-        const response = await api.get('/my-payslips');
-        myPayslips.value = response.data.data;
-    } catch (error) {
-        console.error('Gagal mengambil riwayat gaji:', error);
-    }
+// --- FUNGSI MENDAPATKAN KOORDINAT GPS ---
+const getEmployeeLocation = () => {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject('Browser Anda tidak mendukung fitur lokasi GPS.');
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // Berhasil mendapatkan koordinat
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                // Kita format menjadi string "Lat: -7.xxx, Lng: 112.xxx"
+                resolve(`${lat}, ${lng}`);
+            },
+            (error) => {
+                // Menangani error jika karyawan menolak izin lokasi
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        reject("Anda menolak akses lokasi. Absen dibatalkan.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        reject("Informasi lokasi GPS tidak tersedia saat ini.");
+                        break;
+                    case error.TIMEOUT:
+                        reject("Waktu permintaan lokasi habis (Timeout).");
+                        break;
+                    default:
+                        reject("Terjadi kesalahan sistem yang tidak diketahui.");
+                        break;
+                }
+            },
+            {
+                enableHighAccuracy: true, // Memaksa browser menggunakan GPS (bukan sekadar IP Internet)
+                timeout: 10000,           // Batas waktu tunggu 10 detik
+                maximumAge: 0             // Jangan gunakan cache lokasi lama
+            }
+        );
+    });
 };
 
+// --- FUNGSI CLOCK IN ---
+// --- FUNGSI CLOCK IN ---
+// --- FUNGSI CLOCK IN (DENGAN GPS) ---
 const clockIn = async () => {
     loading.value = true;
     try {
-        await api.post('/attendances/clock-in', {
-            location: 'Kantor Pusat Surabaya' // Bisa diganti dengan Geolocation API peramban nanti
+        // 1. Tampilkan loading SweetAlert karena mencari GPS butuh beberapa detik
+        Swal.fire({
+            title: 'Mencari Lokasi GPS...',
+            html: 'Mohon izinkan akses lokasi pada browser Anda.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
+        // 2. Ambil koordinat menggunakan fungsi yang kita buat
+        const lokasiKaryawan = await getEmployeeLocation();
+
+        // 3. Kirim koordinat asli ke Laravel
+        const response = await api.post('/attendances/clock-in', {
+            location: lokasiKaryawan
+        });
+
+        // 4. Tampilkan pesan sukses
         Swal.fire({
             icon: 'success',
-            title: 'Berhasil Masuk!',
-            text: 'Kehadiran Anda hari ini telah tercatat. Selamat bekerja!',
-            timer: 2500,
+            title: 'Berhasil Clock-In!',
+            html: `${response.data.message}<br><br><b>Lokasi:</b> ${lokasiKaryawan}`,
+            timer: 4000,
             showConfirmButton: false
         });
     } catch (error) {
+        // Jika gagal karena tolak akses GPS atau error server
         Swal.fire({
             icon: 'error',
-            title: 'Gagal Clock In',
-            text: error.response?.data?.message || 'Terjadi kesalahan pada server.',
-            confirmButtonColor: '#2563eb'
+            title: 'Gagal Clock-In',
+            // Cek apakah error dari string (GPS) atau dari server Laravel
+            text: typeof error === 'string' ? error : (error.response?.data?.message || 'Terjadi kesalahan sistem.')
         });
     } finally {
         loading.value = false;
     }
 };
 
+// --- FUNGSI CLOCK OUT (DENGAN GPS) ---
 const clockOut = async () => {
     loading.value = true;
     try {
-        await api.post('/attendances/clock-out');
+        // 1. Tampilkan loading SweetAlert
+        Swal.fire({
+            title: 'Mencari Lokasi GPS...',
+            html: 'Memverifikasi titik lokasi pulang Anda...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
+        // 2. Ambil koordinat GPS
+        const lokasiKaryawan = await getEmployeeLocation();
+
+        // 3. Kirim koordinat ke Laravel
+        const response = await api.post('/attendances/clock-out', {
+            location_out: lokasiKaryawan // Kita kirim dengan nama variabel berbeda jika backend membutuhkannya nanti
+        });
+
+        // 4. Tampilkan pesan sukses
         Swal.fire({
             icon: 'success',
-            title: 'Berhasil Pulang!',
-            text: 'Waktu pulang Anda telah tercatat. Hati-hati di jalan!',
-            timer: 2500,
+            title: 'Berhasil Clock-Out!',
+            html: `${response.data.message}<br><br><b>Lokasi Pulang:</b> ${lokasiKaryawan}<br>Selamat beristirahat!`,
+            timer: 4000,
             showConfirmButton: false
         });
     } catch (error) {
         Swal.fire({
             icon: 'error',
-            title: 'Gagal Clock Out',
-            text: error.response?.data?.message || 'Terjadi kesalahan pada server.',
-            confirmButtonColor: '#2563eb'
+            title: 'Gagal Clock-Out',
+            text: typeof error === 'string' ? error : (error.response?.data?.message || 'Terjadi kesalahan pada server.')
         });
     } finally {
         loading.value = false;
-
     }
 };
 
-// --- FUNGSI CUTI ---
-const fetchMyLeaves = async () => {
-    try {
-        const response = await api.get('/leaves/my-requests');
-        myLeaves.value = response.data.data;
-    } catch (error) {
-        console.error('Gagal mengambil riwayat cuti:', error);
-    }
-};
-
-const leaveForm = reactive({
-    leave_type: 'Tahunan', // Default
-    start_date: '',
-    end_date: '',
-    reason: '',
-    document: null // Untuk menyimpan file
-});
-
-const handleFileUpload = (event) => {
-    leaveForm.document = event.target.files[0];
-};
-
-const submitLeaveRequest = async () => {
-    isSubmittingLeave.value = true;
-    try {
-        // Gunakan FormData karena ada file
-        const formData = new FormData();
-        formData.append('leave_type', leaveForm.leave_type);
-        formData.append('start_date', leaveForm.start_date);
-        formData.append('end_date', leaveForm.end_date);
-        formData.append('reason', leaveForm.reason);
-        if (leaveForm.document) {
-            formData.append('document', leaveForm.document);
-        }
-
-        // Tambahkan header multipart/form-data
-        await api.post('/leaves', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
-
-        // 1. TAMBAHKAN ALERT SUKSES DI SINI
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Pengajuan cuti Anda telah terkirim dan sedang menunggu persetujuan Manajer.',
-            confirmButtonColor: '#4f46e5', // Warna indigo
-        });
-
-        // ... (SweetAlert sukses dan reset form seperti biasa)
-        // Kosongkan form setelah sukses
-        leaveForm.leave_type = 'Tahunan'; // Kembalikan ke default
-        leaveForm.start_date = '';
-        leaveForm.end_date = '';
-        leaveForm.reason = '';
-        leaveForm.document = null;
-
-        // Reset elemen input file HTML (karena input file tidak sepenuhnya bisa direset lewat v-model)
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = '';
-
-        fetchMyLeaves(); // Muat ulang tabel
-    } catch (error) {
-        console.error('Gagal mengajukan cuti:', error);
-
-        // 3. TAMBAHKAN ALERT GAGAL DI SINI
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: error.response?.data?.message || 'Terjadi kesalahan saat mengirim pengajuan cuti. Silakan coba lagi.',
-            confirmButtonColor: '#ef4444', // Warna merah
-        });
-    } finally {
-        isSubmittingLeave.value = false;
-    }
-};
-
-// Muat riwayat cuti saat halaman pertama kali dibuka
 onMounted(() => {
-    fetchMyLeaves();
-    fetchMyPayslips(); // <--- Panggil fungsi baru di sini
+    updateClock();
+    timer = setInterval(updateClock, 1000);
 });
-// KODE FUNGSI ANDA (clockIn, clockOut, fetchMyLeaves, submitLeaveRequest, fetchMyPayslips) 
-// MASUKKAN SEMUANYA DI SINI TANPA ADA PERUBAHAN.
 
-// HAPUS FUNGSI handleLogout() KARENA SUDAH ADA DI SIDEBAR.
+onUnmounted(() => {
+    clearInterval(timer);
+});
 </script>
